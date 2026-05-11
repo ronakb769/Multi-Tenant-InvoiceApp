@@ -1,0 +1,33 @@
+## ── SERVER ──────────────────────────────────────
+server/bin/
+server/obj/
+server/**/bin/
+server/**/obj/
+server/logs/
+server/**/*.log
+
+# Sensitive config
+server/**/appsettings.Development.json
+server/**/appsettings.Production.json
+server/**/appsettings.Staging.json
+
+# NuGet
+server/packages/
+server/**/*.nupkg
+
+## ── CLIENT ──────────────────────────────────────
+client/node_modules/
+client/dist/
+client/.vite/
+client/.env
+client/.env.local
+client/.env.*.local
+
+## ── EDITOR / OS ─────────────────────────────────
+.vs/
+.idea/
+.vscode/
+*.suo
+*.user
+.DS_Store
+Thumbs.db
