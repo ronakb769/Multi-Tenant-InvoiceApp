@@ -1,4 +1,4 @@
-export default function StatCard({ title, value, icon, trend, color = 'primary', prefix = '', suffix = '' }) {
+export default function StatCard({ title, value, icon, trend, color = 'primary' }) {
   const colorMap = {
     primary: '#1d3557',
     secondary: '#457b9d',
@@ -12,29 +12,29 @@ export default function StatCard({ title, value, icon, trend, color = 'primary',
 
   return (
     <div className="card stat-card border-0 shadow-sm h-100">
-      <div className="card-body">
-        <div className="d-flex align-items-start justify-content-between">
-          <div>
-            <p className="text-muted small mb-1 fw-medium text-uppercase" style={{ fontSize: '0.75rem', letterSpacing: '0.05em' }}>
-              {title}
-            </p>
-            <h3 className="fw-bold mb-0">
-              {prefix}{typeof value === 'number' ? value.toLocaleString() : value}{suffix}
-            </h3>
-            {trend !== undefined && (
-              <small className={trend >= 0 ? 'text-success' : 'text-danger'}>
-                <i className={`bi ${trend >= 0 ? 'bi-arrow-up-short' : 'bi-arrow-down-short'}`} />
-                {Math.abs(trend)}% vs last month
-              </small>
-            )}
-          </div>
-          <div
-            className="stat-icon-box"
-            style={{ background: `${bgColor}20` }}
-          >
-            <i className={`bi ${icon}`} style={{ color: bgColor }} />
+      <div className="card-body p-3">
+        {/* Icon + title row — icon stays contained here, never competes with wide value text */}
+        <div className="d-flex align-items-center justify-content-between mb-2">
+          <p className="text-muted fw-semibold mb-0 text-uppercase text-truncate pe-2"
+            style={{ fontSize: '0.68rem', letterSpacing: '0.06em' }}>
+            {title}
+          </p>
+          <div className="stat-icon-box flex-shrink-0" style={{ background: `${bgColor}18`, color: bgColor }}>
+            <i className={`bi ${icon}`} />
           </div>
         </div>
+
+        {/* Value — full width, no icon competing for space */}
+        <div className="fw-bold text-truncate" style={{ fontSize: '1.2rem', lineHeight: 1.3 }}>
+          {typeof value === 'number' ? value.toLocaleString() : value}
+        </div>
+
+        {trend !== undefined && (
+          <small className={`mt-1 d-block ${trend >= 0 ? 'text-success' : 'text-danger'}`}>
+            <i className={`bi ${trend >= 0 ? 'bi-arrow-up-short' : 'bi-arrow-down-short'}`} />
+            {Math.abs(trend)}% vs last month
+          </small>
+        )}
       </div>
     </div>
   )

@@ -23,6 +23,9 @@ client/.env
 client/.env.local
 client/.env.*.local
 
+## ── DOCS / LOCAL FILES ──────────────────────────
+InvoicePro.docs
+
 ## ── EDITOR / OS ─────────────────────────────────
 .vs/
 .idea/

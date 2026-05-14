@@ -80,7 +80,7 @@ public class PaymentService : IPaymentService
         var webhookSecret = _config["Stripe:WebhookSecret"]!;
         StripeConfiguration.ApiKey = _config["Stripe:SecretKey"];
 
-        var stripeEvent = EventUtility.ConstructEvent(payload, signature, webhookSecret);
+        var stripeEvent = EventUtility.ConstructEvent(payload, signature, webhookSecret, throwOnApiVersionMismatch: false);
 
         if (stripeEvent.Type == Events.PaymentIntentSucceeded)
         {

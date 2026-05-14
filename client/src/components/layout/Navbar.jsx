@@ -33,18 +33,20 @@ export default function Navbar() {
   return (
     <nav className="navbar app-navbar px-3 px-md-4">
       <div className="d-flex align-items-center gap-3">
-        {isAuthenticated && (
+        {isAuthenticated ? (
           <button
             className="btn btn-link text-secondary p-0"
             onClick={() => dispatch(toggleSidebarCollapsed())}
+            title="Toggle sidebar"
           >
             <i className="bi bi-list fs-4" />
           </button>
+        ) : (
+          <Link to="/" className="navbar-brand d-flex align-items-center gap-2 mb-0">
+            <i className="bi bi-receipt-cutoff fs-4" style={{ color: 'var(--color-primary)' }} />
+            <span className="fw-bold" style={{ color: 'var(--color-primary)' }}>InvoicePro</span>
+          </Link>
         )}
-        <Link to="/" className="navbar-brand d-flex align-items-center gap-2 mb-0">
-          <i className="bi bi-receipt-cutoff fs-4" style={{ color: 'var(--color-primary)' }} />
-          <span className="fw-bold" style={{ color: 'var(--color-primary)' }}>InvoicePro</span>
-        </Link>
       </div>
 
       <div className="d-flex align-items-center gap-3">

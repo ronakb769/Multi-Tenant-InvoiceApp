@@ -7,6 +7,7 @@ public class InvoiceResponseDto
     public Guid Id { get; set; }
     public string InvoiceNumber { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
+    public string? TenantName { get; set; } = string.Empty;
     public DateTime IssueDate { get; set; }
     public DateTime DueDate { get; set; }
     public decimal SubTotal { get; set; }

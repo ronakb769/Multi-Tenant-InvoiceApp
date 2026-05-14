@@ -33,6 +33,7 @@ public class InvoiceRepository : GenericRepository<Invoice>, IInvoiceRepository
         var query = _context.Invoices
             .Include(x => x.Client)
             .Include(x => x.LineItems)
+            .Include(x => x.Tenant)
             .AsNoTracking();
 
         if (!string.IsNullOrEmpty(status))

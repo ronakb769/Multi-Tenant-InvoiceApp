@@ -109,13 +109,19 @@ public class InvoiceService : IInvoiceService
 
     public async Task<InvoiceResponseDto> UpdateAsync(Guid id, UpdateInvoiceDto dto)
     {
+        // Load WITHOUT .Include(LineItems) — replacing a navigation collection on a tracked
+        // entity triggers EF Core DetectChanges fixup which corrupts the RowVersion snapshot.
         var invoice = await _context.Invoices
-            .Include(x => x.LineItems)
             .FirstOrDefaultAsync(x => x.Id == id)
             ?? throw new KeyNotFoundException($"Invoice {id} not found.");
 
         if (invoice.Status != InvoiceStatus.Draft)
             throw new InvalidOperationException("Only Draft invoices can be edited.");
+
+        // Manual optimistic concurrency check against the value the client last saw.
+        if (dto.RowVersion != null && invoice.RowVersion != null
+            && !dto.RowVersion.SequenceEqual(invoice.RowVersion))
+            throw new InvalidOperationException("Record was modified by another user, please refresh and try again.");
 
         if (dto.ClientId.HasValue) invoice.ClientId = dto.ClientId.Value;
         if (dto.IssueDate.HasValue) invoice.IssueDate = dto.IssueDate.Value;
@@ -124,24 +130,49 @@ public class InvoiceService : IInvoiceService
         if (dto.DiscountAmount.HasValue) invoice.DiscountAmount = dto.DiscountAmount.Value;
         if (dto.Notes != null) invoice.Notes = dto.Notes;
 
-        if (dto.LineItems != null)
+        await using var transaction = await _context.Database.BeginTransactionAsync();
+        try
         {
-            _context.InvoiceLineItems.RemoveRange(invoice.LineItems);
-            invoice.LineItems = dto.LineItems.Select(li => new CoreInvoiceLineItem
+            if (dto.LineItems != null)
             {
-                InvoiceId = invoice.Id,
-                Description = li.Description,
-                Quantity = li.Quantity,
-                UnitPrice = li.UnitPrice,
-                Amount = Math.Round(li.Quantity * li.UnitPrice, 2)
-            }).ToList();
+                // ExecuteDeleteAsync operates directly on the DB — no navigation collection
+                // assignment means EF Core never replaces invoice.LineItems and the RowVersion
+                // snapshot stays intact.
+                await _context.InvoiceLineItems
+                    .Where(x => x.InvoiceId == id)
+                    .ExecuteDeleteAsync();
+
+                var newLineItems = dto.LineItems.Select(li => new CoreInvoiceLineItem
+                {
+                    InvoiceId = invoice.Id,
+                    Description = li.Description,
+                    Quantity = li.Quantity,
+                    UnitPrice = li.UnitPrice,
+                    Amount = Math.Round(li.Quantity * li.UnitPrice, 2)
+                }).ToList();
+
+                _context.InvoiceLineItems.AddRange(newLineItems);
+                invoice.SubTotal = newLineItems.Sum(x => x.Amount);
+            }
+            else
+            {
+                invoice.SubTotal = await _context.InvoiceLineItems
+                    .Where(x => x.InvoiceId == id)
+                    .SumAsync(x => x.Amount);
+            }
+
+            invoice.TaxAmount = Math.Round(invoice.SubTotal * (invoice.TaxRate / 100), 2);
+            invoice.TotalAmount = invoice.SubTotal + invoice.TaxAmount - invoice.DiscountAmount;
+
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
         }
 
-        invoice.SubTotal = invoice.LineItems.Sum(x => x.Amount);
-        invoice.TaxAmount = Math.Round(invoice.SubTotal * (invoice.TaxRate / 100), 2);
-        invoice.TotalAmount = invoice.SubTotal + invoice.TaxAmount - invoice.DiscountAmount;
-
-        await _context.SaveChangesAsync();
         return await GetByIdAsync(invoice.Id);
     }
 
@@ -166,6 +197,16 @@ public class InvoiceService : IInvoiceService
             throw new InvalidOperationException("Only Draft invoices can be sent.");
 
         var pdfBytes = await _pdfService.GenerateInvoicePdfAsync(invoice);
+
+        // Upload to Azure Blob and store URL on invoice
+        try
+        {
+            invoice.PdfBlobUrl = await _pdfService.UploadPdfAsync(invoice);
+        }
+        catch (Exception)
+        {
+            // Blob upload failure doesn't block sending
+        }
 
         try
         {
@@ -249,6 +290,7 @@ public class InvoiceService : IInvoiceService
     {
         Id = inv.Id,
         InvoiceNumber = inv.InvoiceNumber,
+        TenantName = inv.Tenant.Name,
         Status = inv.Status,
         IssueDate = inv.IssueDate,
         DueDate = inv.DueDate,

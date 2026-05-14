@@ -47,12 +47,14 @@ export default function InvoiceFormPage() {
   const lineItems = useWatch({ control, name: 'lineItems' }) || []
   const taxRate = useWatch({ control, name: 'taxRate' }) || 0
   const discountAmount = useWatch({ control, name: 'discountAmount' }) || 0
+  const clientId = useWatch({ control, name: 'clientId' })
 
   const subTotal = lineItems.reduce((sum, li) => sum + (parseFloat(li.quantity) || 0) * (parseFloat(li.unitPrice) || 0), 0)
   const taxAmount = subTotal * (parseFloat(taxRate) / 100)
   const total = subTotal + taxAmount - parseFloat(discountAmount || 0)
 
   const invoice = invoiceData?.data
+  const rowVersion = invoice?.rowVersion
 
   useEffect(() => {
     if (invoice) {
@@ -91,7 +93,7 @@ export default function InvoiceFormPage() {
         discountAmount: parseFloat(data.discountAmount),
       }
       if (isEdit) {
-        await updateInvoice({ id, ...payload }).unwrap()
+        await updateInvoice({ id, ...payload, rowVersion }).unwrap()
         showSuccess('Invoice updated.')
       } else {
         const res = await createInvoice(payload).unwrap()
@@ -129,7 +131,7 @@ export default function InvoiceFormPage() {
                 <div className="mb-3">
                   <label className="form-label fw-semibold">Client <span className="text-danger">*</span></label>
                   <ClientSelectDropdown
-                    value={useWatch({ control, name: 'clientId' })}
+                    value={clientId}
                     onChange={(v) => setValue('clientId', v, { shouldValidate: true })}
                     error={errors.clientId?.message}
                   />

@@ -27,6 +27,7 @@ export default function InvoiceDetailPage() {
   const invoice = data?.data
   if (!invoice) return <div className="alert alert-danger">Invoice not found.</div>
 
+   console.log(invoice,"invoice");
   const isOverdue = invoice.status === 'Overdue'
   const daysOverdue = isOverdue ? getDaysOverdue(invoice.dueDate) : 0
 
@@ -134,7 +135,8 @@ export default function InvoiceDetailPage() {
             <div className="row mb-4">
               <div className="col-6">
                 <div className="text-muted small fw-bold text-uppercase mb-2">From</div>
-                <div className="fw-semibold">{invoice.client?.name ? 'Your Company' : 'Your Company'}</div>
+               
+                <div className="fw-semibold">{invoice.tenantName ? `${invoice.tenantName}` : "Your Company"}</div>
               </div>
               <div className="col-6">
                 <div className="text-muted small fw-bold text-uppercase mb-2">Bill To</div>

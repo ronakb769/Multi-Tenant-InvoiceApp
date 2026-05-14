@@ -23,7 +23,7 @@ export default function ProtectedRoute() {
     }
   }, [data, isError])
 
-  if (isLoading) return <Loader />
+  if (isLoading || !isInitialized) return <Loader />
   if (!isAuthenticated) return <Navigate to="/login" replace />
   return <Outlet />
 }

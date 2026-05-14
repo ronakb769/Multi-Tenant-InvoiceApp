@@ -92,22 +92,22 @@ export default function DashboardPage() {
       {/* Stats */}
       <div className="row g-3 mb-4">
         <div className="col-sm-6 col-xl-2">
-          <StatCard title="Total Clients" value={stats?.totalClients || 0} icon="bi-people" color="primary" />
+          <StatCard title="Total Clients" value={stats?.totalClients || 0} icon="bi-people-fill" color="primary" />
         </div>
         <div className="col-sm-6 col-xl-2">
-          <StatCard title="Total Invoices" value={stats?.totalInvoices || 0} icon="bi-receipt" color="secondary" />
+          <StatCard title="Total Invoices" value={stats?.totalInvoices || 0} icon="bi-receipt-cutoff" color="secondary" />
         </div>
         <div className="col-sm-6 col-xl-2">
-          <StatCard title="Total Revenue" value={formatCurrency(stats?.totalRevenue)} icon="bi-currency-dollar" color="success" />
+          <StatCard title="Total Revenue" value={formatCurrency(stats?.totalRevenue)} icon="bi-cash-stack" color="success" />
         </div>
         <div className="col-sm-6 col-xl-2">
           <StatCard title="Outstanding" value={formatCurrency(stats?.outstandingAmount)} icon="bi-hourglass-split" color="warning" />
         </div>
         <div className="col-sm-6 col-xl-2">
-          <StatCard title="Overdue" value={stats?.overdueCount || 0} icon="bi-exclamation-triangle" color="danger" />
+          <StatCard title="Overdue" value={stats?.overdueCount || 0} icon="bi-exclamation-triangle-fill" color="danger" />
         </div>
         <div className="col-sm-6 col-xl-2">
-          <StatCard title="Paid This Month" value={formatCurrency(stats?.paidThisMonth)} icon="bi-check-circle" color="success" />
+          <StatCard title="Paid This Month" value={formatCurrency(stats?.paidThisMonth)} icon="bi-check-circle-fill" color="success" />
         </div>
       </div>
 
