@@ -9,6 +9,7 @@ const tenantNav = [
   { to: '/dashboard', icon: 'bi-speedometer2', label: 'Dashboard' },
   { to: '/invoices', icon: 'bi-receipt-cutoff', label: 'Invoices' },
   { to: '/clients', icon: 'bi-people-fill', label: 'Clients' },
+  { to: '/users', icon: 'bi-person-badge-fill', label: 'Users', adminOnly: true },
 ]
 
 const adminNav = [
@@ -20,10 +21,12 @@ const adminNav = [
 
 export default function Sidebar() {
   const { user } = useAuth()
-  const { isSuperAdmin } = useRole()
+  const { isSuperAdmin, isTenantAdmin } = useRole()
   const dispatch = useDispatch()
   const collapsed = useSelector((s) => s.ui.sidebarCollapsed)
-  const navItems = isSuperAdmin ? adminNav : tenantNav
+  const navItems = isSuperAdmin
+    ? adminNav
+    : tenantNav.filter((item) => !item.adminOnly || isTenantAdmin)
 
   return (
     <aside className={`sidebar ${collapsed ? 'collapsed' : ''}`}>

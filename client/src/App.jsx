@@ -16,6 +16,8 @@ import RoleRoute from './components/common/RoleRoute'
 import LandingPage from './pages/public/LandingPage'
 import LoginPage from './pages/auth/LoginPage'
 import RegisterPage from './pages/auth/RegisterPage'
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
+import ResetPasswordPage from './pages/auth/ResetPasswordPage'
 import InvoicePaymentPage from './pages/invoices/InvoicePaymentPage'
 
 // Dashboard
@@ -29,6 +31,9 @@ import InvoiceDetailPage from './pages/invoices/InvoiceDetailPage'
 // Clients
 import ClientListPage from './pages/clients/ClientListPage'
 import ClientFormPage from './pages/clients/ClientFormPage'
+
+// Users
+import TenantUsersPage from './pages/users/TenantUsersPage'
 
 // Admin
 import AdminDashboard from './pages/admin/AdminDashboard'
@@ -49,6 +54,8 @@ export default function App() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/reset-password" element={<ResetPasswordPage />} />
       <Route path="/pay/:invoiceId" element={<InvoicePaymentPage />} />
 
       {/* Authenticated */}
@@ -64,6 +71,7 @@ export default function App() {
             <Route path="/clients" element={<ClientListPage />} />
             <Route path="/clients/new" element={<ClientFormPage />} />
             <Route path="/clients/:id/edit" element={<ClientFormPage />} />
+            <Route path="/users" element={<TenantUsersPage />} />
           </Route>
         </Route>
 

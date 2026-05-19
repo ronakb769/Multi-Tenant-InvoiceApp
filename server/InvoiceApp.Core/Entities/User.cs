@@ -11,6 +11,8 @@ public class User : BaseEntity
     public bool IsActive { get; set; } = true;
     public string? RefreshToken { get; set; }
     public DateTime? RefreshTokenExpiry { get; set; }
+    public string? PasswordResetToken { get; set; }
+    public DateTime? PasswordResetTokenExpiry { get; set; }
     public DateTime? LastLogin { get; set; }
     public byte[]? RowVersion { get; set; }
 }

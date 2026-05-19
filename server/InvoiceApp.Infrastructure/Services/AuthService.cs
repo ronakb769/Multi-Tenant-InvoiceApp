@@ -11,6 +11,7 @@ using InvoiceApp.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Logging;
 
 namespace InvoiceApp.Infrastructure.Services;
 
@@ -19,12 +20,17 @@ public class AuthService : IAuthService
     private readonly IUserRepository _userRepo;
     private readonly AppDbContext _context;
     private readonly IConfiguration _config;
+    private readonly IEmailService _emailService;
+    private readonly ILogger<AuthService> _logger;
 
-    public AuthService(IUserRepository userRepo, AppDbContext context, IConfiguration config)
+    public AuthService(IUserRepository userRepo, AppDbContext context, IConfiguration config,
+        IEmailService emailService, ILogger<AuthService> logger)
     {
         _userRepo = userRepo;
         _context = context;
         _config = config;
+        _emailService = emailService;
+        _logger = logger;
     }
 
     public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto)
@@ -153,6 +159,57 @@ public class AuthService : IAuthService
             throw new InvalidOperationException("Current password is incorrect.");
 
         user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword, 12);
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task ForgotPasswordAsync(string email, string clientBaseUrl)
+    {
+        var user = await _context.Users
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(u => u.Email == email);
+
+        // Always return success to prevent email enumeration
+        if (user == null || !user.IsActive)
+            return;
+
+        var token = Convert.ToHexString(RandomNumberGenerator.GetBytes(32));
+        user.PasswordResetToken = BCrypt.Net.BCrypt.HashPassword(token, 10);
+        user.PasswordResetTokenExpiry = DateTime.UtcNow.AddHours(1);
+        await _context.SaveChangesAsync();
+
+        var resetLink = $"{clientBaseUrl}/reset-password?token={Uri.EscapeDataString(token)}&email={Uri.EscapeDataString(email)}";
+
+        try
+        {
+            await _emailService.SendPasswordResetEmailAsync(user.Email, user.Name, resetLink);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to send password reset email to {Email}", email);
+        }
+    }
+
+    public async Task ResetPasswordAsync(ResetPasswordDto dto)
+    {
+        var user = await _context.Users
+            .IgnoreQueryFilters()
+            .FirstOrDefaultAsync(u => u.Email == dto.Email);
+
+        if (user == null
+            || user.PasswordResetToken == null
+            || user.PasswordResetTokenExpiry == null
+            || user.PasswordResetTokenExpiry < DateTime.UtcNow
+            || !BCrypt.Net.BCrypt.Verify(dto.Token, user.PasswordResetToken))
+        {
+            throw new InvalidOperationException("Invalid or expired password reset token.");
+        }
+
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword, 12);
+        user.PasswordResetToken = null;
+        user.PasswordResetTokenExpiry = null;
+        // Invalidate all sessions on password reset
+        user.RefreshToken = null;
+        user.RefreshTokenExpiry = null;
         await _context.SaveChangesAsync();
     }
 

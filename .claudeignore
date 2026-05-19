@@ -1,0 +1,44 @@
+# Build artifacts
+**/bin/
+**/obj/
+
+# Dependencies
+**/node_modules/
+
+# EF Migrations (large, rarely need to read)
+**/Migrations/
+
+# Lock files
+**/package-lock.json
+**/yarn.lock
+**/pnpm-lock.yaml
+
+# Minified assets
+**/*.min.js
+**/*.min.css
+
+# IDE / OS
+**/.vs/
+**/.vscode/
+**/.idea/
+**/*.user
+**/.DS_Store
+**/Thumbs.db
+
+# Logs & temp
+**/logs/
+**/*.log
+**/*.tmp
+
+# Test results
+**/TestResults/
+**/coverage/
+
+# Publish output
+**/publish/
+**/dist/
+
+# Word / Office docs (not code)
+**/*.docx
+**/*.xlsx
+**/*.pdf

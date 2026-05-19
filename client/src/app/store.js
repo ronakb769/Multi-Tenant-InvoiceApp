@@ -7,6 +7,7 @@ import { clientApi } from '../services/clientApi'
 import { paymentApi } from '../services/paymentApi'
 import { dashboardApi } from '../services/dashboardApi'
 import { adminApi } from '../services/adminApi'
+import { tenantApi } from '../services/tenantApi'
 
 export const store = configureStore({
   reducer: {
@@ -18,6 +19,7 @@ export const store = configureStore({
     [paymentApi.reducerPath]: paymentApi.reducer,
     [dashboardApi.reducerPath]: dashboardApi.reducer,
     [adminApi.reducerPath]: adminApi.reducer,
+    [tenantApi.reducerPath]: tenantApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -26,6 +28,7 @@ export const store = configureStore({
       clientApi.middleware,
       paymentApi.middleware,
       dashboardApi.middleware,
-      adminApi.middleware
+      adminApi.middleware,
+      tenantApi.middleware
     ),
 })

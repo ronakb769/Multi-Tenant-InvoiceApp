@@ -25,6 +25,12 @@ export const authApi = createApi({
     changePassword: builder.mutation({
       query: (body) => ({ url: '/auth/me/password', method: 'PUT', body }),
     }),
+    forgotPassword: builder.mutation({
+      query: (body) => ({ url: '/auth/forgot-password', method: 'POST', body }),
+    }),
+    resetPassword: builder.mutation({
+      query: (body) => ({ url: '/auth/reset-password', method: 'POST', body }),
+    }),
     checkSubdomain: builder.query({
       query: (subdomain) => ({ url: '/tenant/check-subdomain', params: { subdomain } }),
     }),
@@ -38,5 +44,7 @@ export const {
   useGetMeQuery,
   useUpdateProfileMutation,
   useChangePasswordMutation,
+  useForgotPasswordMutation,
+  useResetPasswordMutation,
   useCheckSubdomainQuery,
 } = authApi

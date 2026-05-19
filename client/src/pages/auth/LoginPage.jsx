@@ -104,6 +104,9 @@ export default function LoginPage() {
                     <input className="form-check-input" type="checkbox" id="rememberMe" />
                     <label className="form-check-label small" htmlFor="rememberMe">Remember me</label>
                   </div>
+                  <Link to="/forgot-password" className="small text-primary fw-semibold">
+                    Forgot password?
+                  </Link>
                 </div>
 
                 <button

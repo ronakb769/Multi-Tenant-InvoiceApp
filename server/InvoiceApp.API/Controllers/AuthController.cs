@@ -4,6 +4,7 @@ using InvoiceApp.Core.Interfaces;
 using InvoiceApp.Core.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 
 namespace InvoiceApp.API.Controllers;
 
@@ -13,11 +14,13 @@ public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
     private readonly ITenantContext _tenantContext;
+    private readonly IConfiguration _config;
 
-    public AuthController(IAuthService authService, ITenantContext tenantContext)
+    public AuthController(IAuthService authService, ITenantContext tenantContext, IConfiguration config)
     {
         _authService = authService;
         _tenantContext = tenantContext;
+        _config = config;
     }
 
     [HttpPost("register")]
@@ -82,6 +85,22 @@ public class AuthController : ControllerBase
     {
         await _authService.ChangePasswordAsync(_tenantContext.UserId, dto.CurrentPassword, dto.NewPassword);
         return Ok(ApiResponse<object>.Ok(null!, "Password changed successfully."));
+    }
+
+    [HttpPost("forgot-password")]
+    public async Task<ActionResult<ApiResponse<object>>> ForgotPassword([FromBody] ForgotPasswordDto dto)
+    {
+        var clientBaseUrl = _config["ClientApp:BaseUrl"] ?? "http://localhost:5173";
+        await _authService.ForgotPasswordAsync(dto.Email, clientBaseUrl);
+        // Always 200 — never reveal whether the email exists
+        return Ok(ApiResponse<object>.Ok(null!, "If that email is registered, a reset link has been sent."));
+    }
+
+    [HttpPost("reset-password")]
+    public async Task<ActionResult<ApiResponse<object>>> ResetPassword([FromBody] ResetPasswordDto dto)
+    {
+        await _authService.ResetPasswordAsync(dto);
+        return Ok(ApiResponse<object>.Ok(null!, "Password has been reset successfully."));
     }
 
     private void SetRefreshTokenCookie(string? token)

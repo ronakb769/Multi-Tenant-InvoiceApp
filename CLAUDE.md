@@ -198,6 +198,28 @@ GET    /api/v1/tenant/users
 
 ---
 
+## Common Edit Locations (skip exploration — go straight here)
+
+| Task | File(s) |
+|---|---|
+| **Add / edit API endpoint** | `server/InvoiceApp.API/Controllers/<Entity>Controller.cs` |
+| **Add / edit service logic** | `server/InvoiceApp.Infrastructure/Services/<Entity>Service.cs` |
+| **Add repository method** | `server/InvoiceApp.Infrastructure/Repositories/<Entity>Repository.cs` |
+| **Add interface** | `server/InvoiceApp.Core/Interfaces/Services/` or `Interfaces/Repositories/` |
+| **Add DTO** | `server/InvoiceApp.Core/DTOs/<Entity>/` (subfolders: Auth, Client, Common, Dashboard, Invoice, User) |
+| **Add / edit validator** | `server/InvoiceApp.Core/Validators/<Name>Validator.cs` |
+| **Wire up DI / middleware** | `server/InvoiceApp.API/Program.cs` |
+| **Edit RTK Query service** | `client/src/services/<entity>Api.js` (authApi, invoiceApi, clientApi, paymentApi, dashboardApi, adminApi, tenantApi) |
+| **Edit Redux slice** | `client/src/features/auth/authSlice.js` or `features/ui/uiSlice.js` |
+| **Add / edit page** | `client/src/pages/<section>/` → register route in `client/src/App.jsx` |
+| **Add sidebar nav item** | `client/src/components/layout/Sidebar.jsx` |
+| **Add shared UI component** | `client/src/components/common/` |
+| **Edit invoice / client components** | `client/src/components/invoice/` or `components/client/` |
+| **Redux store wiring** | `client/src/app/store.js` |
+| **DB schema change** | `dotnet ef migrations add <Name> --project "../InvoiceApp.Infrastructure"` (run from `server/InvoiceApp.API/`) |
+
+---
+
 ## Known Gotchas
 
 1. **`IgnoreQueryFilters()` + `FindAsync`** → use `FirstOrDefaultAsync(x => x.Id == id)` instead
