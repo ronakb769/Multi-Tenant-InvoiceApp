@@ -3,11 +3,13 @@ using InvoiceApp.Core.DTOs.Common;
 using InvoiceApp.Core.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace InvoiceApp.API.Controllers;
 
 [ApiController]
 [Route("api/v1/payments")]
+[EnableRateLimiting("api")]
 public class PaymentController : ControllerBase
 {
     private readonly IPaymentService _paymentService;

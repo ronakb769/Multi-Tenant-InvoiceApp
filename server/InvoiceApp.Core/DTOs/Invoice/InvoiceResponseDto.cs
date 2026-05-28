@@ -8,6 +8,8 @@ public class InvoiceResponseDto
     public string InvoiceNumber { get; set; } = string.Empty;
     public string Status { get; set; } = string.Empty;
     public string? TenantName { get; set; } = string.Empty;
+    public string? TenantLogoUrl { get; set; }
+    public string? TenantPrimaryColor { get; set; }
     public DateTime IssueDate { get; set; }
     public DateTime DueDate { get; set; }
     public decimal SubTotal { get; set; }

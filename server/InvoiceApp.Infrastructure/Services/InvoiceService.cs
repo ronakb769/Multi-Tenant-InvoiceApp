@@ -290,7 +290,9 @@ public class InvoiceService : IInvoiceService
     {
         Id = inv.Id,
         InvoiceNumber = inv.InvoiceNumber,
-        TenantName = inv.Tenant.Name,
+        TenantName = inv.Tenant?.Name,
+        TenantLogoUrl = inv.Tenant?.LogoUrl,
+        TenantPrimaryColor = inv.Tenant?.PrimaryColor,
         Status = inv.Status,
         IssueDate = inv.IssueDate,
         DueDate = inv.DueDate,

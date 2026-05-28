@@ -79,9 +79,11 @@ DTOs/Invoice/
  InvoiceLineItemDto.cs
  InvoiceResponseDto.cs
  UpdateInvoiceDto.cs
-DTOs/User/
- CreateTenantUserDto.cs
- TenantUserResponseDto.cs
+DTOs/
+ Tenant/TenantBrandingDto.cs
+ User/
+  CreateTenantUserDto.cs
+  TenantUserResponseDto.cs
 Entities/
  BaseEntity.cs
  Client.cs

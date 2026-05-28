@@ -66,6 +66,9 @@ public class PdfService : IPdfService
 
     private static string BuildInvoiceHtml(Invoice invoice)
     {
+        var brand = invoice.Tenant?.PrimaryColor ?? "#1d3557";
+        var logoUrl = invoice.Tenant?.LogoUrl;
+
         var statusColor = invoice.Status?.ToString() switch
         {
             "Sent"      => "#0d6efd",
@@ -74,6 +77,10 @@ public class PdfService : IPdfService
             "Cancelled" => "#adb5bd",
             _           => "#6c757d"
         };
+
+        var logoHtml = !string.IsNullOrWhiteSpace(logoUrl)
+            ? $"<img src='{System.Net.WebUtility.HtmlEncode(logoUrl)}' alt='logo' style='max-height:56px;max-width:180px;object-fit:contain;margin-bottom:4px' />"
+            : "";
 
         var lineItemsHtml = string.Join("", invoice.LineItems.Select(li =>
             $@"<tr>
@@ -86,7 +93,7 @@ public class PdfService : IPdfService
         var notesHtml = string.IsNullOrEmpty(invoice.Notes) ? "" :
             $@"<div style='margin-top:28px'>
                  <div style='color:#6c757d;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;margin-bottom:4px'>Notes</div>
-                 <div style='color:#f4a261;font-weight:500'>{System.Net.WebUtility.HtmlEncode(invoice.Notes)}</div>
+                 <div style='font-weight:500'>{System.Net.WebUtility.HtmlEncode(invoice.Notes)}</div>
                </div>";
 
         return $@"<!DOCTYPE html>
@@ -96,21 +103,23 @@ public class PdfService : IPdfService
 <style>
   body {{ font-family: Arial, sans-serif; font-size: 14px; color: #212529; margin: 40px; }}
   table {{ width: 100%; border-collapse: collapse; }}
-  th {{ background: #1d3557; color: white; padding: 10px 12px; text-align: left; font-size: 13px; }}
+  th {{ background: {brand}; color: white; padding: 10px 12px; text-align: left; font-size: 13px; }}
 </style>
 </head>
 <body>
 
-<div style='font-size:26px;font-weight:bold;color:#1d3557;margin-bottom:8px'>{System.Net.WebUtility.HtmlEncode(invoice.InvoiceNumber)}</div>
-<div style='margin-bottom:28px'>
-  <span style='display:inline-block;padding:3px 12px;border-radius:6px;font-size:12px;font-weight:bold;background:{statusColor};color:white'>{invoice.Status}</span>
+<div style='display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px'>
+  <div>
+    {logoHtml}
+    <div style='font-size:20px;font-weight:bold;color:{brand}'>{System.Net.WebUtility.HtmlEncode(invoice.Tenant?.Name ?? "Company")}</div>
+  </div>
+  <div style='text-align:right'>
+    <div style='font-size:26px;font-weight:bold;color:{brand}'>{System.Net.WebUtility.HtmlEncode(invoice.InvoiceNumber)}</div>
+    <span style='display:inline-block;padding:3px 12px;border-radius:6px;font-size:12px;font-weight:bold;background:{statusColor};color:white'>{invoice.Status}</span>
+  </div>
 </div>
 
 <div style='display:flex;gap:48px;margin-bottom:20px'>
-  <div style='flex:1'>
-    <div style='color:#6c757d;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;margin-bottom:4px'>From</div>
-    <div><strong>{System.Net.WebUtility.HtmlEncode(invoice.Tenant?.Name ?? "Company")}</strong></div>
-  </div>
   <div style='flex:1'>
     <div style='color:#6c757d;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;margin-bottom:4px'>Bill To</div>
     <div><strong>{System.Net.WebUtility.HtmlEncode(invoice.Client?.Name ?? "")}</strong></div>
@@ -118,20 +127,15 @@ public class PdfService : IPdfService
     <div>{System.Net.WebUtility.HtmlEncode(invoice.Client?.Address ?? "")}</div>
     <div>{System.Net.WebUtility.HtmlEncode(invoice.Client?.City ?? "")} {System.Net.WebUtility.HtmlEncode(invoice.Client?.Country ?? "")}</div>
   </div>
-</div>
-
-<div style='display:flex;gap:48px;margin-bottom:32px'>
   <div style='flex:1'>
     <div style='color:#6c757d;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;margin-bottom:4px'>Issue Date</div>
     <div><strong>{invoice.IssueDate:MMM dd, yyyy}</strong></div>
-  </div>
-  <div style='flex:1'>
-    <div style='color:#6c757d;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;margin-bottom:4px'>Due Date</div>
+    <div style='color:#6c757d;font-size:11px;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;margin-bottom:4px;margin-top:12px'>Due Date</div>
     <div><strong>{invoice.DueDate:MMM dd, yyyy}</strong></div>
   </div>
 </div>
 
-<table>
+<table style='margin-top:16px'>
   <thead>
     <tr>
       <th>Description</th>
@@ -155,8 +159,8 @@ public class PdfService : IPdfService
       <td style='padding:8px 12px;border-bottom:1px solid #dee2e6;text-align:right;color:#dc3545'>-${invoice.DiscountAmount:F2}</td>
     </tr>
     <tr style='background:#f8f9fa'>
-      <td style='padding:10px 12px;border-top:2px solid #1d3557;text-align:right;font-weight:bold;font-size:15px' colspan='3'>Total</td>
-      <td style='padding:10px 12px;border-top:2px solid #1d3557;text-align:right;font-weight:bold;font-size:15px'>${invoice.TotalAmount:F2}</td>
+      <td style='padding:10px 12px;border-top:2px solid {brand};text-align:right;font-weight:bold;font-size:15px' colspan='3'>Total</td>
+      <td style='padding:10px 12px;border-top:2px solid {brand};text-align:right;font-weight:bold;font-size:15px;color:{brand}'>${invoice.TotalAmount:F2}</td>
     </tr>
   </tbody>
 </table>

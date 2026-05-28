@@ -4,12 +4,14 @@ using InvoiceApp.Core.Interfaces;
 using InvoiceApp.Core.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.Extensions.Configuration;
 
 namespace InvoiceApp.API.Controllers;
 
 [ApiController]
 [Route("api/v1/auth")]
+[EnableRateLimiting("api")]
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
@@ -23,6 +25,7 @@ public class AuthController : ControllerBase
         _config = config;
     }
 
+    [EnableRateLimiting("auth")]
     [HttpPost("register")]
     public async Task<ActionResult<ApiResponse<AuthResponseDto>>> Register([FromBody] RegisterDto dto)
     {
@@ -32,6 +35,7 @@ public class AuthController : ControllerBase
         return Ok(ApiResponse<AuthResponseDto>.Ok(result, "Registration successful."));
     }
 
+    [EnableRateLimiting("auth")]
     [HttpPost("login")]
     public async Task<ActionResult<ApiResponse<AuthResponseDto>>> Login([FromBody] LoginDto dto)
     {
@@ -87,6 +91,7 @@ public class AuthController : ControllerBase
         return Ok(ApiResponse<object>.Ok(null!, "Password changed successfully."));
     }
 
+    [EnableRateLimiting("auth")]
     [HttpPost("forgot-password")]
     public async Task<ActionResult<ApiResponse<object>>> ForgotPassword([FromBody] ForgotPasswordDto dto)
     {
@@ -96,6 +101,7 @@ public class AuthController : ControllerBase
         return Ok(ApiResponse<object>.Ok(null!, "If that email is registered, a reset link has been sent."));
     }
 
+    [EnableRateLimiting("auth")]
     [HttpPost("reset-password")]
     public async Task<ActionResult<ApiResponse<object>>> ResetPassword([FromBody] ResetPasswordDto dto)
     {

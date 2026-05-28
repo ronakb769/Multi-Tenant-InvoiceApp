@@ -4,6 +4,7 @@ using InvoiceApp.Core.Interfaces.Services;
 using InvoiceApp.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceApp.API.Controllers;
@@ -11,6 +12,7 @@ namespace InvoiceApp.API.Controllers;
 [ApiController]
 [Route("api/v1/admin")]
 [Authorize(Roles = Roles.SuperAdmin)]
+[EnableRateLimiting("api")]
 public class AdminController : ControllerBase
 {
     private readonly IDashboardService _dashboardService;

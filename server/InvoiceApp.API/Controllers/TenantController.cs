@@ -1,10 +1,12 @@
 using InvoiceApp.Core.Constants;
 using InvoiceApp.Core.DTOs.Common;
+using InvoiceApp.Core.DTOs.Tenant;
 using InvoiceApp.Core.DTOs.User;
 using InvoiceApp.Core.Interfaces;
 using InvoiceApp.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceApp.API.Controllers;
@@ -12,6 +14,7 @@ namespace InvoiceApp.API.Controllers;
 [ApiController]
 [Route("api/v1/tenant")]
 [Authorize]
+[EnableRateLimiting("api")]
 public class TenantController : ControllerBase
 {
     private readonly AppDbContext _context;
@@ -21,6 +24,56 @@ public class TenantController : ControllerBase
     {
         _context = context;
         _tenantContext = tenantContext;
+    }
+
+    [HttpGet("settings")]
+    [Authorize(Roles = $"{Roles.TenantAdmin},{Roles.User}")]
+    public async Task<ActionResult<ApiResponse<TenantSettingsResponseDto>>> GetSettings()
+    {
+        var tenant = await _context.Tenants.FindAsync(_tenantContext.TenantId);
+        if (tenant == null)
+            return NotFound(ApiResponse<TenantSettingsResponseDto>.Fail("Tenant not found."));
+
+        var dto = new TenantSettingsResponseDto
+        {
+            Id = tenant.Id,
+            Name = tenant.Name,
+            Subdomain = tenant.Subdomain,
+            Plan = tenant.Plan,
+            LogoUrl = tenant.LogoUrl,
+            PrimaryColor = tenant.PrimaryColor,
+            MaxUsers = tenant.MaxUsers
+        };
+        return Ok(ApiResponse<TenantSettingsResponseDto>.Ok(dto));
+    }
+
+    [HttpPatch("settings/branding")]
+    [Authorize(Roles = Roles.TenantAdmin)]
+    public async Task<ActionResult<ApiResponse<TenantSettingsResponseDto>>> UpdateBranding([FromBody] UpdateTenantBrandingDto dto)
+    {
+        var tenant = await _context.Tenants.FindAsync(_tenantContext.TenantId);
+        if (tenant == null)
+            return NotFound(ApiResponse<TenantSettingsResponseDto>.Fail("Tenant not found."));
+
+        if (dto.LogoUrl != null)
+            tenant.LogoUrl = string.IsNullOrWhiteSpace(dto.LogoUrl) ? null : dto.LogoUrl;
+
+        if (!string.IsNullOrWhiteSpace(dto.PrimaryColor))
+            tenant.PrimaryColor = dto.PrimaryColor;
+
+        await _context.SaveChangesAsync();
+
+        var response = new TenantSettingsResponseDto
+        {
+            Id = tenant.Id,
+            Name = tenant.Name,
+            Subdomain = tenant.Subdomain,
+            Plan = tenant.Plan,
+            LogoUrl = tenant.LogoUrl,
+            PrimaryColor = tenant.PrimaryColor,
+            MaxUsers = tenant.MaxUsers
+        };
+        return Ok(ApiResponse<TenantSettingsResponseDto>.Ok(response, "Branding updated."));
     }
 
     [HttpGet("check-subdomain")]

@@ -18,4 +18,5 @@ public class UserDto
     public string? TenantSubdomain { get; set; }
     public string? TenantPlan { get; set; }
     public string? LogoUrl { get; set; }
+    public string? TenantPrimaryColor { get; set; }
 }

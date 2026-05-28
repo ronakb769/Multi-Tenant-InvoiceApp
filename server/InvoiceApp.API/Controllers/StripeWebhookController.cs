@@ -1,10 +1,12 @@
 using InvoiceApp.Core.Interfaces.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace InvoiceApp.API.Controllers;
 
 [ApiController]
 [Route("api/v1/payments/stripe")]
+[EnableRateLimiting("webhook")]
 public class StripeWebhookController : ControllerBase
 {
     private readonly IPaymentService _paymentService;

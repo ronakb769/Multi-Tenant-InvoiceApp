@@ -3,6 +3,7 @@ using InvoiceApp.Core.DTOs.Common;
 using InvoiceApp.Infrastructure.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 namespace InvoiceApp.API.Controllers;
@@ -10,6 +11,7 @@ namespace InvoiceApp.API.Controllers;
 [ApiController]
 [Route("api/v1/users")]
 [Authorize(Roles = Roles.TenantAdmin)]
+[EnableRateLimiting("api")]
 public class UserController : ControllerBase
 {
     private readonly AppDbContext _context;

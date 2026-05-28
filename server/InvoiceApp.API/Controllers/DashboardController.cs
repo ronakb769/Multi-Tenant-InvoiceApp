@@ -4,12 +4,14 @@ using InvoiceApp.Core.DTOs.Dashboard;
 using InvoiceApp.Core.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace InvoiceApp.API.Controllers;
 
 [ApiController]
 [Route("api/v1/dashboard")]
 [Authorize(Roles = $"{Roles.TenantAdmin},{Roles.User}")]
+[EnableRateLimiting("api")]
 public class DashboardController : ControllerBase
 {
     private readonly IDashboardService _dashboardService;

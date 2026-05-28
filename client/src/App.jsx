@@ -35,6 +35,9 @@ import ClientFormPage from './pages/clients/ClientFormPage'
 // Users
 import TenantUsersPage from './pages/users/TenantUsersPage'
 
+// Settings
+import TenantSettingsPage from './pages/settings/TenantSettingsPage'
+
 // Admin
 import AdminDashboard from './pages/admin/AdminDashboard'
 import TenantManagementPage from './pages/admin/TenantManagementPage'
@@ -72,6 +75,7 @@ export default function App() {
             <Route path="/clients/new" element={<ClientFormPage />} />
             <Route path="/clients/:id/edit" element={<ClientFormPage />} />
             <Route path="/users" element={<TenantUsersPage />} />
+            <Route path="/settings" element={<TenantSettingsPage />} />
           </Route>
         </Route>
 

@@ -5,12 +5,14 @@ using InvoiceApp.Core.DTOs.Invoice;
 using InvoiceApp.Core.Interfaces.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace InvoiceApp.API.Controllers;
 
 [ApiController]
 [Route("api/v1/clients")]
 [Authorize(Roles = $"{Roles.TenantAdmin},{Roles.User}")]
+[EnableRateLimiting("api")]
 public class ClientController : ControllerBase
 {
     private readonly IClientService _clientService;

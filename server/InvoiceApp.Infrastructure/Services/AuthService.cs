@@ -192,6 +192,7 @@ public class AuthService : IAuthService
     public async Task ResetPasswordAsync(ResetPasswordDto dto)
     {
         var user = await _context.Users
+
             .IgnoreQueryFilters()
             .FirstOrDefaultAsync(u => u.Email == dto.Email);
 
@@ -230,7 +231,8 @@ public class AuthService : IAuthService
                 TenantName = tenant?.Name,
                 TenantSubdomain = tenant?.Subdomain,
                 TenantPlan = tenant?.Plan,
-                LogoUrl = tenant?.LogoUrl
+                LogoUrl = tenant?.LogoUrl,
+                TenantPrimaryColor = tenant?.PrimaryColor
             }
         });
     }

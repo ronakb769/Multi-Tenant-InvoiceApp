@@ -10,6 +10,7 @@ const tenantNav = [
   { to: '/invoices', icon: 'bi-receipt-cutoff', label: 'Invoices' },
   { to: '/clients', icon: 'bi-people-fill', label: 'Clients' },
   { to: '/users', icon: 'bi-person-badge-fill', label: 'Users', adminOnly: true },
+  { to: '/settings', icon: 'bi-palette-fill', label: 'Branding', adminOnly: true },
 ]
 
 const adminNav = [
@@ -34,9 +35,17 @@ export default function Sidebar() {
       {/* Brand logo */}
       <div className="sidebar-brand d-flex align-items-center gap-2 px-4 border-bottom border-white border-opacity-10"
         style={{ height: 64, minHeight: 64, flexShrink: 0 }}>
-        <i className="bi bi-receipt-cutoff text-white flex-shrink-0" style={{ fontSize: 22 }} />
-        <span className="sidebar-label fw-bold text-white" style={{ fontSize: '1.05rem', letterSpacing: '0.02em' }}>
-          InvoicePro
+        {user?.logoUrl ? (
+          <img
+            src={user.logoUrl}
+            alt={user.tenantName}
+            style={{ height: 32, maxWidth: 120, objectFit: 'contain', filter: 'brightness(0) invert(1)', flexShrink: 0 }}
+          />
+        ) : (
+          <i className="bi bi-receipt-cutoff text-white flex-shrink-0" style={{ fontSize: 22 }} />
+        )}
+        <span className="sidebar-label fw-bold text-white text-truncate" style={{ fontSize: '1.05rem', letterSpacing: '0.02em' }}>
+          {user?.tenantName || 'InvoicePro'}
         </span>
       </div>
 

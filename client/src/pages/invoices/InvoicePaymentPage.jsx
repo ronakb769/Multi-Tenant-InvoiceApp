@@ -59,9 +59,18 @@ export default function InvoicePaymentPage() {
 
   useEffect(() => {
     axiosInstance.get(`/invoices/${invoiceId}`)
-      .then((res) => setInvoice(res.data.data))
+      .then((res) => {
+        const inv = res.data.data
+        setInvoice(inv)
+        if (inv?.tenantPrimaryColor) {
+          document.documentElement.style.setProperty('--color-primary', inv.tenantPrimaryColor)
+        }
+      })
       .catch(() => {})
       .finally(() => setLoading(false))
+    return () => {
+      document.documentElement.style.removeProperty('--color-primary')
+    }
   }, [invoiceId])
 
   if (loading) return <Loader />
@@ -98,10 +107,18 @@ export default function InvoicePaymentPage() {
   return (
     <div className="min-vh-100 d-flex align-items-center justify-content-center py-5" style={{ background: 'var(--color-light-bg)' }}>
       <div className="w-100" style={{ maxWidth: 500 }}>
-        {/* Header */}
+        {/* Branded header */}
         <div className="text-center mb-4">
-          <i className="bi bi-receipt-cutoff fs-2 mb-2 d-block" style={{ color: 'var(--color-primary)' }} />
-          <h4 className="fw-bold">Pay Invoice</h4>
+          {invoice.tenantLogoUrl ? (
+            <img
+              src={invoice.tenantLogoUrl}
+              alt={invoice.tenantName}
+              style={{ maxHeight: 56, maxWidth: 200, objectFit: 'contain', marginBottom: 8 }}
+            />
+          ) : (
+            <i className="bi bi-receipt-cutoff fs-2 mb-2 d-block" style={{ color: 'var(--color-primary)' }} />
+          )}
+          <h4 className="fw-bold">{invoice.tenantName || 'Pay Invoice'}</h4>
           <span className="badge bg-secondary">{invoice.invoiceNumber}</span>
         </div>
 
